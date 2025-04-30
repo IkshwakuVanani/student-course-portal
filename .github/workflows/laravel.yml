@@ -1,3 +1,4 @@
+# .github/workflows/laravel.yml
 name: Laravel CI
 
 on:
@@ -9,30 +10,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:                            # Optional: applies to all run steps
+    defaults:
       run:
         working-directory: student-course-portal
-    env:
-      DB_CONNECTION: sqlite
-      DB_DATABASE: database/database.sqlite
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache Composer dependencies
+      - name: Cache Composer deps
         uses: actions/cache@v3
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer- 
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'      # ← bump to 8.1 or 8.2
-          extensions: mbstring, bcmath, sqlite, pdo_mysql   # your needed extensions
-          tools: composer         # ensure Composer is available :contentReference[oaicite:5]{index=5}
+          php-version: '8.1'
+          extensions: mbstring, bcmath, sqlite, pdo_mysql
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
@@ -49,5 +46,5 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
 
-      - name: Run tests
+      - name: Run PHPUnit tests
         run: vendor/bin/phpunit --configuration phpunit.xml --verbose
