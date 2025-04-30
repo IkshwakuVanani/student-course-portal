@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:                            # Optional: applies to all run steps
+      run:
+        working-directory: student-course-portal
     env:
       DB_CONNECTION: sqlite
       DB_DATABASE: database/database.sqlite
