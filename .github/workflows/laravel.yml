@@ -10,19 +10,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: student-course-portal/student-course-portal
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Install deps
+        run: composer install --prefer-dist --no-progress
 
       - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           extensions: mbstring, bcmath, sqlite, pdo_mysql
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
 
       - name: Copy environment file
         run: cp .env.example .env
