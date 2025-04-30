@@ -10,7 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Use SQLite in CI to avoid external services
       DB_CONNECTION: sqlite
       DB_DATABASE: database/database.sqlite
 
@@ -18,21 +17,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cache Composer deps
+      - name: Cache Composer dependencies
         uses: actions/cache@v3
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          restore-keys: ${{ runner.os }}-composer- 
 
-      - name: Setup PHP
+      - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
-          extensions: mbstring, bcmath, sqlite, pdo_mysql
+          php-version: '8.1'      # ← bump to 8.1 or 8.2
+          extensions: mbstring, bcmath, sqlite, pdo_mysql   # your needed extensions
+          tools: composer         # ensure Composer is available :contentReference[oaicite:5]{index=5}
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist --no-progress
 
       - name: Copy environment file
         run: cp .env.example .env
@@ -40,11 +40,11 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
-      - name: Create SQLite database
+      - name: Prepare SQLite database
         run: mkdir -p database && touch database/database.sqlite
 
       - name: Run migrations
         run: php artisan migrate --force
 
-      - name: Run PHPUnit tests
+      - name: Run tests
         run: vendor/bin/phpunit --configuration phpunit.xml --verbose
